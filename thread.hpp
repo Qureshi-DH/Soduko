@@ -17,7 +17,7 @@ using namespace Utility;
 namespace ThreadFunctions{
     void * ColumnChecker(void * args){
         unsigned short test_array[9] = {0};
-        unsigned column = *((unsigned*)args);
+        unsigned & column = *((unsigned*)args);
         for (unsigned i=0;i<9;++i){
             test_array[Soduko::grid[i][column] - 1]++;
         }
@@ -27,7 +27,7 @@ namespace ThreadFunctions{
 
     void * RowChecker(void * args){
         unsigned short test_array[9] = {0};
-        unsigned row = *((unsigned*)args);
+        unsigned & row  = *((unsigned*)args);
         for (unsigned i=0;i<9;++i){
             test_array[Soduko::grid[row][i] - 1]++;
         }
@@ -37,6 +37,20 @@ namespace ThreadFunctions{
 
     void * RegionChecker(void * args){
 
+    }
+}
+
+namespace Threads{
+    pthread_t row_threads[9],column_threads[9],region_threads[9];
+}
+
+using namespace Threads;
+
+void CreateThreads(){
+    int array[9] = {1,2,3,4,5,6,7,8,9};
+    for (unsigned i=0;i<9;++i){
+        pthread_create(&row_threads[i],NULL,ThreadFunctions::RowChecker,&array[i]);
+        pthread_create(&column_threads[i],NULL,ThreadFunctions::ColumnChecker,&array[i]);
     }
 }
 
