@@ -19,7 +19,7 @@ namespace ThreadFunctions{
         unsigned short test_array[9] = {0};
         unsigned column = *((unsigned*)args);
         for (unsigned i=0;i<9;++i){
-            test_array[Soduko::grid[i][column]]++;
+            test_array[Soduko::grid[i][column] - 1]++;
         }
         bool status = Utility::CheckArray(test_array,9);
         pthread_exit(&status);
@@ -29,7 +29,7 @@ namespace ThreadFunctions{
         unsigned short test_array[9] = {0};
         unsigned row = *((unsigned*)args);
         for (unsigned i=0;i<9;++i){
-            test_array[Soduko::grid[row][i]]++;
+            test_array[Soduko::grid[row][i] - 1]++;
         }
         bool status = Utility::CheckArray(test_array,9);
         pthread_exit(&status);
