@@ -1,11 +1,11 @@
 #ifndef _TUPLE__
 #define _TUPLE__
 
-struct tuple{
+struct Tuple{
     int row;
     int col;
-    tuple():row(0),col(0){}
-    tuple(int _row,int _col):row(_row),col(_col){}
+    Tuple():row(0),col(0){}
+    Tuple(int _row,int _col):row(_row),col(_col){}
 };
 
 #endif
