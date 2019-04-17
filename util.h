@@ -8,9 +8,7 @@ namespace Utility{
             if (!array[i])
                 return 0;
         return 1;
-    }
-
-    
+    }    
 }
 
 #endif

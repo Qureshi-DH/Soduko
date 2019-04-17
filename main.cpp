@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "grid.hpp"
+#include "util.h"
 
 //using namespace std;
 
