@@ -25,7 +25,13 @@ namespace ThreadFunctions{
     }
 
     void * RowChecker(void * args){
-
+        unsigned short test_array[9] = {0};
+        unsigned row = *((unsigned*)args);
+        for (unsigned i=0;i<9;++i){
+            test_array[Soduko::grid[row][i]]++;
+        }
+        bool status = Utility::CheckArray(test_array,9);
+        pthread_exit(&status);
     }
 
     void * RegionChecker(void * args){
