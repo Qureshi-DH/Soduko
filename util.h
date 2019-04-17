@@ -7,7 +7,7 @@ namespace Utility{
     template <class type>
     bool CheckArray(type*array, unsigned size){
         for (unsigned i=0;i<size;++i)
-            if (!array[i])
+            if (array[i] != 1)
                 return 0;
         return 1;
     }
