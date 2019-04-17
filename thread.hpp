@@ -44,13 +44,16 @@ namespace Threads{
     pthread_t row_threads[9],column_threads[9],region_threads[9];
 }
 
-using namespace Threads;
-
 void CreateThreads(){
+    using namespace Threads;
     int array[9] = {1,2,3,4,5,6,7,8,9};
-    for (unsigned i=0;i<9;++i){
+    Tuple region[9];
+    for (short i=0,j=-1;i<9;++i){
+        j = i%3==0?++j:j;
+        region[i] = Tuple(j,i%3);
         pthread_create(&row_threads[i],NULL,ThreadFunctions::RowChecker,&array[i]);
         pthread_create(&column_threads[i],NULL,ThreadFunctions::ColumnChecker,&array[i]);
+        pthread_create(&region_threads[i],NULL,ThreadFunctions::RegionChecker,&region[i]);
     }
 }
 
