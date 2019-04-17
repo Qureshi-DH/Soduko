@@ -6,6 +6,8 @@ class Soduko{
 };
 
 #ifndef _GRID_INITILIZED
+#undef _GRID_UNINITIALIZED
+#define _GRID_INITILIZED
 
 Soduko::grid = {{8,3,5,4,1,6,9,2,7},
                 {2,9,6,8,5,7,4,3,1},
@@ -17,8 +19,6 @@ Soduko::grid = {{8,3,5,4,1,6,9,2,7},
                 {9,8,1,3,4,5,2,7,6},
                 {3,7,4,9,6,2,8,1,5}};
 
-#undef _GRID_UNINITIALIZED
-#define _GRID_INITILIZED
 #endif
 
 #endif
