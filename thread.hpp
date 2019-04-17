@@ -3,6 +3,7 @@
 #include <wait.h>
 #include <stdio.h>
 #include <semaphore.h>
+#include <pthread.h>
 
 #include "grid.hpp"
 #include "util.h"
