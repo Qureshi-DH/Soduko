@@ -21,8 +21,8 @@ namespace ThreadFunctions{
         for (unsigned i=0;i<9;++i){
             test_array[Soduko::grid[i][column] - 1]++;
         }
-        bool status = Utility::CheckArray(test_array,9);
-        pthread_exit(&status);
+        Tuple invalid_position = Utility::CheckArray(test_array,9);
+        pthread_exit(&invalid_position);
     }
 
     void * RowChecker(void * args){
@@ -31,8 +31,8 @@ namespace ThreadFunctions{
         for (unsigned i=0;i<9;++i){
             test_array[Soduko::grid[row][i] - 1]++;
         }
-        bool status = Utility::CheckArray(test_array,9);
-        pthread_exit(&status);
+        Tuple invalid_position = Utility::CheckArray(test_array,9);
+        pthread_exit(&invalid_position);
     }
 
     void * RegionChecker(void * args){
@@ -41,8 +41,8 @@ namespace ThreadFunctions{
         for (unsigned i=tuple.row*3,k=0;k<3;++i,++k)
             for (unsigned j=tuple.col*3,l=0;l<3;++j,++l)
                 test_array[Soduko::grid[i][j] - 1]++;
-        bool status = Utility::CheckArray(test_array,9);
-        pthread_exit(&status);
+        Tuple invalid_position = Utility::CheckArray(test_array,9);
+        pthread_exit(&invalid_position);
     }
 }
 
@@ -61,6 +61,10 @@ void CreateThreads(){
         pthread_create(&column_threads[i],NULL,ThreadFunctions::ColumnChecker,&array[i]);
         pthread_create(&region_threads[i],NULL,ThreadFunctions::RegionChecker,&region[i]);
     }
+}
+
+void JoinThreads(){
+
 }
 
 #endif
