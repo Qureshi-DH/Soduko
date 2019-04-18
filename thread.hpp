@@ -36,7 +36,13 @@ namespace ThreadFunctions{
     }
 
     void * RegionChecker(void * args){
-
+        unsigned short test_array[9] = {0};
+        Tuple & tuple  = *((Tuple*)args);
+        for (unsigned i=tuple.row*3,k=0;k<3;++i,++k)
+            for (unsigned j=tuple.col*3,l=0;l<3;++j,++l)
+                test_array[Soduko::grid[i][j] - 1]++;
+        bool status = Utility::CheckArray(test_array,9);
+        pthread_exit(&status);
     }
 }
 
