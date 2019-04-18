@@ -90,17 +90,20 @@ bool JoinThreads(){
         pthread_join(ThreadStructs::row_threads[i],&status);
         Tuple & received_position = *((Tuple*)status);
         if (received_position.row != -1 && received_position.col != -1){
-            invalid_boxes.push_back(received_position);
+            if (!Utility::CheckIfExists(invalid_boxes,received_position));
+                invalid_boxes.push_back(received_position);
             current_status = Validity::Invalid;
         }
         pthread_join(ThreadStructs::column_threads[i],&status);
         if (received_position.row != -1 && received_position.col != -1){
-            invalid_boxes.push_back(received_position);
+            if (!Utility::CheckIfExists(invalid_boxes,received_position));
+                invalid_boxes.push_back(received_position);
             current_status = Validity::Invalid;
         }
         pthread_join(ThreadStructs::region_threads[i],&status);
         if (received_position.row != -1 && received_position.col != -1){
-            invalid_boxes.push_back(received_position);
+            if (!Utility::CheckIfExists(invalid_boxes,received_position));
+                invalid_boxes.push_back(received_position);
             current_status = Validity::Invalid;
         }
     }
