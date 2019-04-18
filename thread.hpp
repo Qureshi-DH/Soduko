@@ -40,12 +40,12 @@ namespace ThreadFunctions{
     }
 }
 
-namespace Threads{
+namespace ThreadStructs{
     pthread_t row_threads[9],column_threads[9],region_threads[9];
 }
 
 void CreateThreads(){
-    using namespace Threads;
+    using namespace ThreadStructs;
     int array[9] = {1,2,3,4,5,6,7,8,9};
     Tuple region[9];
     for (short i=0,j=-1;i<9;++i){
