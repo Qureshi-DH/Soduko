@@ -9,7 +9,7 @@
 #include "util.h"
 #include "tuple.h"
 
-using namespace Utility;
+//using namespace Utility;
 
 #ifndef _THREAD_FUNCTIONS_
 #define _THREAD_FUNCTIONS_
