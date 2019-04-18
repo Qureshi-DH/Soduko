@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <semaphore.h>
 #include <pthread.h>
+#include <vector>
 
 #include "grid.hpp"
 #include "util.h"
@@ -16,32 +17,37 @@
 
 namespace ThreadFunctions{
     void * ColumnChecker(void * args){
-        unsigned short test_array[9] = {0};
         unsigned & column = *((unsigned*)args);
+        static Tuple invalid_position = Tuple(-1,-1);
         for (unsigned i=0;i<9;++i){
-            test_array[Soduko::grid[i][column] - 1]++;
+            if (Soduko::grid[i][column] > 9 || Soduko::grid[i][column] < 1){
+                invalid_position = Tuple(i,column);
+            }
         }
-        Tuple invalid_position = Utility::CheckArray(test_array,9);
         pthread_exit(&invalid_position);
     }
 
     void * RowChecker(void * args){
-        unsigned short test_array[9] = {0};
-        unsigned & row  = *((unsigned*)args);
+        unsigned & row = *((unsigned*)args);
+        static Tuple invalid_position = Tuple(-1,-1);
         for (unsigned i=0;i<9;++i){
-            test_array[Soduko::grid[row][i] - 1]++;
+            if (Soduko::grid[row][i] > 9 || Soduko::grid[row][i] < 1){
+                invalid_position = Tuple(row,i);
+            }
         }
-        Tuple invalid_position = Utility::CheckArray(test_array,9);
         pthread_exit(&invalid_position);
     }
 
     void * RegionChecker(void * args){
-        unsigned short test_array[9] = {0};
         Tuple & tuple  = *((Tuple*)args);
-        for (unsigned i=tuple.row*3,k=0;k<3;++i,++k)
-            for (unsigned j=tuple.col*3,l=0;l<3;++j,++l)
-                test_array[Soduko::grid[i][j] - 1]++;
-        Tuple invalid_position = Utility::CheckArray(test_array,9);
+        static Tuple invalid_position = Tuple(-1,-1);
+        for (unsigned i=tuple.row*3,k=0;k<3;++i,++k){
+            for (unsigned j=tuple.col*3,l=0;l<3;++j,++l){
+                if (Soduko::grid[i][j] < 1 || Soduko::grid[i][j] > 9){
+                    invalid_position = Tuple(i,j);
+                }
+            }
+        }
         pthread_exit(&invalid_position);
     }
 }
@@ -49,6 +55,8 @@ namespace ThreadFunctions{
 namespace ThreadStructs{
     pthread_t row_threads[9],column_threads[9],region_threads[9];
 }
+
+std::vector <Tuple> invalid_boxes;
 
 void CreateThreads(){
     using namespace ThreadStructs;
@@ -63,8 +71,28 @@ void CreateThreads(){
     }
 }
 
-void JoinThreads(){
-
+bool JoinThreads(){
+    void * status;
+    Validity current_status = Validity::Valid;
+    for (short i=0;i<9;++i){
+        Tuple & received_position = *((Tuple*)status);
+        pthread_join(ThreadStructs::row_threads[i],&status);
+        if (received_position.row != -1 && received_position.col != -1){
+            invalid_boxes.push_back(received_position);
+            current_status = Validity::Invalid;
+        }
+        pthread_join(ThreadStructs::column_threads[i],&status);
+        if (received_position.row != -1 && received_position.col != -1){
+            invalid_boxes.push_back(received_position);
+            current_status = Validity::Invalid;
+        }
+        pthread_join(ThreadStructs::region_threads[i],&status);
+        if (received_position.row != -1 && received_position.col != -1){
+            invalid_boxes.push_back(received_position);
+            current_status = Validity::Invalid;
+        }
+    }
+    return current_status;
 }
 
 #endif
