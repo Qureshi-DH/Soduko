@@ -23,4 +23,8 @@ namespace Utility{
     }  
 }
 
+enum Validity{
+    Invalid,Valid
+};
+
 #endif
