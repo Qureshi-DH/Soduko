@@ -68,7 +68,11 @@ namespace ThreadStructs{
     pthread_t row_threads[9],column_threads[9],region_threads[9];
 }
 
-std::vector <Tuple> invalid_boxes;
+namespace GLOBAL_DATA{
+    sem_t novux;
+    Validity boxes_status[27] = {Validity::Valid};
+    std::vector <Tuple> invalid_boxes;
+}
 
 void CreateThreads(){
     using namespace ThreadStructs;
@@ -90,21 +94,24 @@ bool JoinThreads(){
         pthread_join(ThreadStructs::row_threads[i],&status);
         Tuple & received_position = *((Tuple*)status);
         if (received_position.row != -1 && received_position.col != -1){
-            if (!Utility::CheckIfExists(invalid_boxes,received_position));
-                invalid_boxes.push_back(received_position);
+            if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position))
+                GLOBAL_DATA::invalid_boxes.push_back(received_position);
             current_status = Validity::Invalid;
+            GLOBAL_DATA::boxes_status[i] = Validity::Invalid;
         }
         pthread_join(ThreadStructs::column_threads[i],&status);
         if (received_position.row != -1 && received_position.col != -1){
-            if (!Utility::CheckIfExists(invalid_boxes,received_position));
-                invalid_boxes.push_back(received_position);
+            if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position))
+                GLOBAL_DATA::invalid_boxes.push_back(received_position);
             current_status = Validity::Invalid;
+            GLOBAL_DATA::boxes_status[i+9] = Validity::Invalid;
         }
         pthread_join(ThreadStructs::region_threads[i],&status);
         if (received_position.row != -1 && received_position.col != -1){
-            if (!Utility::CheckIfExists(invalid_boxes,received_position));
-                invalid_boxes.push_back(received_position);
+            if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position))
+                GLOBAL_DATA::invalid_boxes.push_back(received_position);
             current_status = Validity::Invalid;
+            GLOBAL_DATA::boxes_status[i+18] = Validity::Invalid;
         }
     }
     return current_status;
