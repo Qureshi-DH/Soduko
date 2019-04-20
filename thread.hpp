@@ -88,19 +88,22 @@ void CreateThreads(){
 bool JoinThreads(){
     Validity current_status = Validity::Valid;
     for (short i=0;i<9;++i){
-        void * status;
-        pthread_join(ThreadStructs::row_threads[i],&status);
-        Tuple & received_position = (*((Tuple*)status));
-        if (received_position.row != -1 && received_position.col != -1){
-            if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position))
-                GLOBAL_DATA::invalid_boxes.push_back(received_position);
+        void * status1,*status2,*status3;
+        pthread_join(ThreadStructs::row_threads[i],&status1);
+        Tuple & received_position1 = (*((Tuple*)status1));
+        if (received_position1.row != -1 && received_position1.col != -1){
+            if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position1))
+                GLOBAL_DATA::invalid_boxes.push_back(received_position1);
             current_status = Validity::Invalid;
             sem_wait(&GLOBAL_DATA::novux);
             GLOBAL_DATA::boxes_status[i] = Validity::Invalid;
             sem_post(&GLOBAL_DATA::novux);
             std::cout << "Thread ID: " 
                       << ThreadStructs::row_threads[i] 
-                      << " calculated invalid Result"
+                      << " calculated INVALID --> Row[" << i << "]"
+                      << std::endl
+                      << "(Row,Column) = (" << received_position1.row << "," <<received_position1.col << ") "
+                      << "Value = " << Soduko::grid[received_position1.row][received_position1.col] 
                       << std::endl;
         }
         else{
@@ -108,17 +111,21 @@ bool JoinThreads(){
             GLOBAL_DATA::boxes_status[i] = Validity::Valid;
             sem_post(&GLOBAL_DATA::novux);
         }
-        pthread_join(ThreadStructs::column_threads[i],&status);
-        if (received_position.row != -1 && received_position.col != -1){
-            if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position))
-                GLOBAL_DATA::invalid_boxes.push_back(received_position);
+        pthread_join(ThreadStructs::column_threads[i],&status2);
+        Tuple & received_position2 = (*((Tuple*)status2));
+        if (received_position2.row != -1 && received_position2.col != -1){
+            if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position2))
+                GLOBAL_DATA::invalid_boxes.push_back(received_position2);
             current_status = Validity::Invalid;
             sem_wait(&GLOBAL_DATA::novux);
             GLOBAL_DATA::boxes_status[i+9] = Validity::Invalid;
             sem_post(&GLOBAL_DATA::novux);
             std::cout << "Thread ID: " 
                       << ThreadStructs::column_threads[i] 
-                      << " calculated invalid Result"
+                      << " calculated INVALID --> Column[" << i << "]"
+                      << std::endl
+                      << "(Row,Column) = (" << received_position2.row << "," <<received_position2.col << ") "
+                      << "Value = " << Soduko::grid[received_position2.row][received_position2.col] 
                       << std::endl;
         }
         else{
@@ -126,17 +133,21 @@ bool JoinThreads(){
             GLOBAL_DATA::boxes_status[i+9] = Validity::Valid;
             sem_post(&GLOBAL_DATA::novux);
         }
-        pthread_join(ThreadStructs::region_threads[i],&status);
-        if (received_position.row != -1 && received_position.col != -1){
-            if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position))
-                GLOBAL_DATA::invalid_boxes.push_back(received_position);
+        pthread_join(ThreadStructs::region_threads[i],&status3);
+        Tuple & received_position3 = (*((Tuple*)status3));
+        if (received_position3.row != -1 && received_position3.col != -1){
+            if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position3))
+                GLOBAL_DATA::invalid_boxes.push_back(received_position3);
             current_status = Validity::Invalid;
             sem_wait(&GLOBAL_DATA::novux);
             GLOBAL_DATA::boxes_status[i+18] = Validity::Invalid;
             sem_post(&GLOBAL_DATA::novux);
             std::cout << "Thread ID: " 
                       << ThreadStructs::region_threads[i] 
-                      << " calculated invalid Result"
+                      << " calculated INVALID -- > Box[" << i << "]"
+                      << std::endl
+                      << "(Row,Column) = (" << received_position3.row << "," <<received_position3.col << ") "
+                      << "Value = " << Soduko::grid[received_position3.row][received_position3.col] 
                       << std::endl;
         }
         else{
