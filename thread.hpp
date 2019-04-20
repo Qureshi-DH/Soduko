@@ -16,51 +16,49 @@
 #define _THREAD_FUNCTIONS_
 
 namespace ThreadFunctions{
+    Tuple invalid_position[27];
     void * ColumnChecker(void * args){
         unsigned test_array[9] = {0};
         unsigned & column = *((unsigned*)args);
-        static Tuple invalid_position = Tuple(-1,-1);
         for (unsigned i=0;i<9;++i){
             if (Soduko::grid[i][column] > 9 || Soduko::grid[i][column] < 1){
-                invalid_position = Tuple(i,column);
+                invalid_position[column+9] = Tuple(i,column);
             }
             else if (++test_array[Soduko::grid[i][column]-1] != 1){
-                invalid_position = Tuple(i,column);
+                invalid_position[column+9] = Tuple(i,column);
             }
         }
-        pthread_exit(&invalid_position);
+        pthread_exit(&invalid_position[column+9]);
     }
 
     void * RowChecker(void * args){
         unsigned test_array[9] = {0};
         unsigned & row = *((unsigned*)args);
-        static Tuple invalid_position = Tuple(-1,-1);
         for (unsigned i=0;i<9;++i){
             if (Soduko::grid[row][i] > 9 || Soduko::grid[row][i] < 1){
-                invalid_position = Tuple(row,i);
+                invalid_position[row] = Tuple(row,i);
             }
             else if (++test_array[Soduko::grid[row][i]-1] != 1){
-                invalid_position = Tuple(row,i);
+                invalid_position[row] = Tuple(row,i);
             }
         }
-        pthread_exit(&invalid_position);
+        pthread_exit(&invalid_position[row]);
     }
 
     void * RegionChecker(void * args){
         unsigned test_array[9] = {0};
         Tuple & tuple  = *((Tuple*)args);
-        static Tuple invalid_position = Tuple(-1,-1);
         for (unsigned i=tuple.row*3,k=0;k<3;++i,++k){
             for (unsigned j=tuple.col*3,l=0;l<3;++j,++l){
                 if (Soduko::grid[i][j] < 1 || Soduko::grid[i][j] > 9){
-                    invalid_position = Tuple(i,j);
+                    invalid_position[(tuple.row*3)+tuple.col+18] = Tuple(i,j);
                 }
                 else if (++test_array[Soduko::grid[i][j]-1] != 1){
-                    invalid_position = Tuple(i,j);
+                    invalid_position[(tuple.row*3)+tuple.col+18] = Tuple(i,j);
                 }
             }
         }
-        pthread_exit(&invalid_position);
+        pthread_exit(&invalid_position[(tuple.row*3)+tuple.col+18]);
     }
 }
 
@@ -88,30 +86,63 @@ void CreateThreads(){
 }
 
 bool JoinThreads(){
-    void * status;
     Validity current_status = Validity::Valid;
     for (short i=0;i<9;++i){
+        void * status;
         pthread_join(ThreadStructs::row_threads[i],&status);
-        Tuple & received_position = *((Tuple*)status);
+        Tuple & received_position = (*((Tuple*)status));
         if (received_position.row != -1 && received_position.col != -1){
             if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position))
                 GLOBAL_DATA::invalid_boxes.push_back(received_position);
             current_status = Validity::Invalid;
+            sem_wait(&GLOBAL_DATA::novux);
             GLOBAL_DATA::boxes_status[i] = Validity::Invalid;
+            sem_post(&GLOBAL_DATA::novux);
+            std::cout << "Thread ID: " 
+                      << ThreadStructs::row_threads[i] 
+                      << " calculated invalid Result"
+                      << std::endl;
+        }
+        else{
+            sem_wait(&GLOBAL_DATA::novux);
+            GLOBAL_DATA::boxes_status[i] = Validity::Valid;
+            sem_post(&GLOBAL_DATA::novux);
         }
         pthread_join(ThreadStructs::column_threads[i],&status);
         if (received_position.row != -1 && received_position.col != -1){
             if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position))
                 GLOBAL_DATA::invalid_boxes.push_back(received_position);
             current_status = Validity::Invalid;
+            sem_wait(&GLOBAL_DATA::novux);
             GLOBAL_DATA::boxes_status[i+9] = Validity::Invalid;
+            sem_post(&GLOBAL_DATA::novux);
+            std::cout << "Thread ID: " 
+                      << ThreadStructs::column_threads[i] 
+                      << " calculated invalid Result"
+                      << std::endl;
+        }
+        else{
+            sem_wait(&GLOBAL_DATA::novux);
+            GLOBAL_DATA::boxes_status[i+9] = Validity::Valid;
+            sem_post(&GLOBAL_DATA::novux);
         }
         pthread_join(ThreadStructs::region_threads[i],&status);
         if (received_position.row != -1 && received_position.col != -1){
             if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position))
                 GLOBAL_DATA::invalid_boxes.push_back(received_position);
             current_status = Validity::Invalid;
+            sem_wait(&GLOBAL_DATA::novux);
             GLOBAL_DATA::boxes_status[i+18] = Validity::Invalid;
+            sem_post(&GLOBAL_DATA::novux);
+            std::cout << "Thread ID: " 
+                      << ThreadStructs::region_threads[i] 
+                      << " calculated invalid Result"
+                      << std::endl;
+        }
+        else{
+            sem_wait(&GLOBAL_DATA::novux);
+            GLOBAL_DATA::boxes_status[i+18] = Validity::Valid;
+            sem_post(&GLOBAL_DATA::novux);
         }
     }
     return current_status;
