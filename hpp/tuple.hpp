@@ -1,5 +1,3 @@
-#include <iostream>
-
 #ifndef _TUPLE__
 #define _TUPLE__
 

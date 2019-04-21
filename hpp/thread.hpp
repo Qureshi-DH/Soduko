@@ -7,8 +7,8 @@
 #include <vector>
 
 #include "grid.hpp"
-#include "util.h"
-#include "tuple.h"
+#include "util.hpp"
+#include "tuple.hpp"
 
 //using namespace Utility;
 

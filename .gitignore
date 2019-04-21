@@ -5,3 +5,15 @@
 .vscode/ipch/8aa66f8a32f02440/mmap_address.bin
 .vscode/ipch/1bb01643aa445710/mmap_address.bin
 .vscode/ipch/1bb01643aa445710/thread.ipch
+a.out
+grid
+grid.hpp.gch
+thread.hpp.gch
+tuple.h.gch
+util.h.gch
+.vscode/launch.json
+.vscode/tasks.json
+.gitignore
+.vscode/settings.json
+.vscode/ipch/1bc133af77f060e3/main.ipch
+.vscode/ipch/1bc133af77f060e3/mmap_address.bin

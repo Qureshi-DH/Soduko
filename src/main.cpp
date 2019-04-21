@@ -3,9 +3,7 @@
 #include <wait.h>
 #include <stdio.h>
 
-#include "grid.hpp"
-#include "util.h"
-#include "thread.hpp"
+#include "../hpp/thread.hpp"
 
 using namespace GLOBAL_DATA;
 
