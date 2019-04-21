@@ -105,6 +105,7 @@ bool JoinThreads(){
                       << "(Row,Column) = (" << received_position1.row << "," <<received_position1.col << ") "
                       << "Value = " << Soduko::grid[received_position1.row][received_position1.col] 
                       << std::endl;
+            pthread_cancel(ThreadStructs::row_threads[i]);
         }
         else{
             sem_wait(&GLOBAL_DATA::novux);
@@ -127,6 +128,7 @@ bool JoinThreads(){
                       << "(Row,Column) = (" << received_position2.row << "," <<received_position2.col << ") "
                       << "Value = " << Soduko::grid[received_position2.row][received_position2.col] 
                       << std::endl;
+            pthread_cancel(ThreadStructs::column_threads[i]);
         }
         else{
             sem_wait(&GLOBAL_DATA::novux);
@@ -149,6 +151,7 @@ bool JoinThreads(){
                       << "(Row,Column) = (" << received_position3.row << "," <<received_position3.col << ") "
                       << "Value = " << Soduko::grid[received_position3.row][received_position3.col] 
                       << std::endl;
+            pthread_cancel(ThreadStructs::region_threads[i]);
         }
         else{
             sem_wait(&GLOBAL_DATA::novux);
