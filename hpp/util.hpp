@@ -6,6 +6,10 @@
 #define _UTIL_HEAD
 
 namespace Utility{
+
+    #define PRINT_GREEN(x) std::cout << "\033[1;32m" << x << "\033[0m"
+    #define PRINT_RED(x)   std::cout << "\033[1;31m" << x << "\033[0m"
+
     template <class type>
     bool CheckArray(type*array, unsigned size){
         for (unsigned i=0;i<size;++i)
@@ -28,16 +32,10 @@ namespace Utility{
             for (unsigned j=0;j<dimension;++j){
                 Tuple auxiliary(i,j);
                 if (CheckIfExists(list,auxiliary)){
-                    std::cout << "\033[1;31m"
-                              <<(array[i][j])
-                              << "\033[0m"
-                              <<" ";
+                    PRINT_RED(array[i][j]) << " ";
                 }
                 else{
-                    std::cout << "\033[1;32m"
-                              <<(array[i][j])
-                              << "\033[0m"
-                              <<" ";
+                    PRINT_GREEN(array[i][j]) << " ";
                 }
             }
             std::cout << std::endl;
