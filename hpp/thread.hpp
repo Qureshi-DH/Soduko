@@ -98,7 +98,7 @@ bool JoinThreads(){
             sem_wait(&GLOBAL_DATA::novux);
             GLOBAL_DATA::boxes_status[i] = Validity::Invalid;
             sem_post(&GLOBAL_DATA::novux);
-            std::cout << "Thread ID: " 
+            PRINT_RED ("Thread ID: ") 
                       << ThreadStructs::row_threads[i] 
                       << " calculated INVALID --> Row[" << i << "]"
                       << std::endl
@@ -120,7 +120,7 @@ bool JoinThreads(){
             sem_wait(&GLOBAL_DATA::novux);
             GLOBAL_DATA::boxes_status[i+9] = Validity::Invalid;
             sem_post(&GLOBAL_DATA::novux);
-            std::cout << "Thread ID: " 
+            PRINT_RED ("Thread ID: ") 
                       << ThreadStructs::column_threads[i] 
                       << " calculated INVALID --> Column[" << i << "]"
                       << std::endl
@@ -142,7 +142,7 @@ bool JoinThreads(){
             sem_wait(&GLOBAL_DATA::novux);
             GLOBAL_DATA::boxes_status[i+18] = Validity::Invalid;
             sem_post(&GLOBAL_DATA::novux);
-            std::cout << "Thread ID: " 
+            PRINT_RED ("Thread ID: ") 
                       << ThreadStructs::region_threads[i] 
                       << " calculated INVALID -- > Box[" << i << "]"
                       << std::endl
