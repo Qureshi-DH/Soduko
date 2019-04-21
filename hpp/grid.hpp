@@ -3,7 +3,7 @@
 
 namespace Soduko{
     static const int dimension = 9;
-    static const int grid[dimension][dimension] = { {8,3,5,4,1,6,9,2,7},
+    static const int grid[dimension][dimension] = { {8,3,5,4,1,6,10,2,7},
                                                     {2,9,6,8,5,7,4,3,1},
                                                     {4,1,7,2,9,3,6,5,8},
                                                     {5,6,9,6,3,4,7,8,2},

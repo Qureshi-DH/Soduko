@@ -85,8 +85,8 @@ void CreateThreads(){
     }
 }
 
-bool JoinThreads(){
-    Validity current_status = Validity::Valid;
+bool* JoinThreads(){
+    static bool error_type[2] = {false};
     for (short i=0;i<9;++i){
         void * status1,*status2,*status3;
         pthread_join(ThreadStructs::row_threads[i],&status1);
@@ -94,7 +94,10 @@ bool JoinThreads(){
         if (received_position1.row != -1 && received_position1.col != -1){
             if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position1))
                 GLOBAL_DATA::invalid_boxes.push_back(received_position1);
-            current_status = Validity::Invalid;
+            if (Soduko::grid[received_position1.row][received_position1.col] > 9 || Soduko::grid[received_position1.row][received_position1.col] < 1)
+                error_type[0] = true;
+            else
+                error_type[1] = true;
             sem_wait(&GLOBAL_DATA::novux);
             GLOBAL_DATA::boxes_status[i] = Validity::Invalid;
             sem_post(&GLOBAL_DATA::novux);
@@ -117,7 +120,10 @@ bool JoinThreads(){
         if (received_position2.row != -1 && received_position2.col != -1){
             if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position2))
                 GLOBAL_DATA::invalid_boxes.push_back(received_position2);
-            current_status = Validity::Invalid;
+            if (Soduko::grid[received_position2.row][received_position2.col] > 9 || Soduko::grid[received_position2.row][received_position2.col] < 1)
+                error_type[0] = true;
+            else
+                error_type[1] = true;
             sem_wait(&GLOBAL_DATA::novux);
             GLOBAL_DATA::boxes_status[i+9] = Validity::Invalid;
             sem_post(&GLOBAL_DATA::novux);
@@ -140,7 +146,10 @@ bool JoinThreads(){
         if (received_position3.row != -1 && received_position3.col != -1){
             if (!Utility::CheckIfExists(GLOBAL_DATA::invalid_boxes,received_position3))
                 GLOBAL_DATA::invalid_boxes.push_back(received_position3);
-            current_status = Validity::Invalid;
+            if (Soduko::grid[received_position3.row][received_position3.col] > 9 || Soduko::grid[received_position3.row][received_position3.col] < 1)
+                error_type[0] = true;
+            else
+                error_type[1] = true;
             sem_wait(&GLOBAL_DATA::novux);
             GLOBAL_DATA::boxes_status[i+18] = Validity::Invalid;
             sem_post(&GLOBAL_DATA::novux);
@@ -159,7 +168,7 @@ bool JoinThreads(){
             sem_post(&GLOBAL_DATA::novux);
         }
     }
-    return current_status;
+    return error_type;
 }
 
 #endif
