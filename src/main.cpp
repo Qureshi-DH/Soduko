@@ -1,8 +1,3 @@
-#include <unistd.h>
-#include <fcntl.h>
-#include <wait.h>
-#include <stdio.h>
-
 #include "../hpp/thread.hpp"
 
 using namespace GLOBAL_DATA;
@@ -11,7 +6,10 @@ int main(int argc,char*argv[]){
     sem_init(&GLOBAL_DATA::novux,0,1);
     CreateThreads();
     bool status = JoinThreads();
+    std::cout << "---------------------\n";
     Utility::Print2DArray(Soduko::grid,9,GLOBAL_DATA::invalid_boxes);
-    std::cout << "Validity = " << (status?("\033[1;32mValid\033[0m"):("\033[1;31mInvalid\033[0m")) << std::endl;
+    std::cout << "---------------------\n";
+    std::cout << "Validity = ";
+    status?(PRINT_GREEN("Valid")):(PRINT_RED("Invalid")) << std::endl;
     pthread_exit(NULL);
 }
