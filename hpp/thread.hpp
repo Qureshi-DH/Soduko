@@ -15,6 +15,17 @@
 #ifndef _THREAD_FUNCTIONS_
 #define _THREAD_FUNCTIONS_
 
+namespace ThreadStructs{
+    pthread_t row_threads[9],column_threads[9],region_threads[9];
+}
+
+namespace GLOBAL_DATA{
+    sem_t novux;
+    int boxes_status[27] = {-1};
+    std::vector <Tuple> invalid_boxes;
+    int error_count[Soduko::dimension][Soduko::dimension] = {{0}};
+}
+
 namespace ThreadFunctions{
     Tuple invalid_position[27];
     void * ColumnChecker(void * args){
@@ -26,6 +37,16 @@ namespace ThreadFunctions{
             }
             else if (++test_array[Soduko::grid[i][column]-1] != 1){
                 invalid_position[column+9] = Tuple(i,column);
+            }
+        }
+        for (short i=0;i<9;++i){
+            if (test_array[Soduko::grid[i][column]-1] == 2){
+                sem_wait(&GLOBAL_DATA::novux);
+                ++GLOBAL_DATA::error_count[i][column];
+                sem_post(&GLOBAL_DATA::novux);
+            }
+            else if (test_array[Soduko::grid[i][column]-1] == 0){
+                GLOBAL_DATA::boxes_status[i+9] = Soduko::grid[i][column];
             }
         }
         pthread_exit(&invalid_position[column+9]);
@@ -40,6 +61,16 @@ namespace ThreadFunctions{
             }
             else if (++test_array[Soduko::grid[row][i]-1] != 1){
                 invalid_position[row] = Tuple(row,i);
+            }
+        }
+        for (short i=0;i<9;++i){
+            if (test_array[Soduko::grid[row][i]-1] == 2){
+                sem_wait(&GLOBAL_DATA::novux);
+                ++GLOBAL_DATA::error_count[row][i];
+                sem_post(&GLOBAL_DATA::novux);
+            }
+            else if (test_array[Soduko::grid[row][i]-1] == 0){
+                GLOBAL_DATA::boxes_status[i] = Soduko::grid[row][i];
             }
         }
         pthread_exit(&invalid_position[row]);
@@ -58,18 +89,25 @@ namespace ThreadFunctions{
                 }
             }
         }
+        for (unsigned i=tuple.row*3,k=0;k<3;++i,++k){
+            for (unsigned j=tuple.col*3,l=0;l<3;++j,++l){
+                if (test_array[Soduko::grid[i][j]-1] == 2){
+                    sem_wait(&GLOBAL_DATA::novux);
+                    ++GLOBAL_DATA::error_count[i][j];
+                    sem_post(&GLOBAL_DATA::novux);
+                }
+                else if (test_array[Soduko::grid[i][j]-1] == 0){
+                    GLOBAL_DATA::boxes_status[i+18] = Soduko::grid[i][j];
+                }
+            }
+        }
+
         pthread_exit(&invalid_position[(tuple.row*3)+tuple.col+18]);
     }
-}
 
-namespace ThreadStructs{
-    pthread_t row_threads[9],column_threads[9],region_threads[9];
-}
+    void * FixInvalidEntry(void * args){
 
-namespace GLOBAL_DATA{
-    sem_t novux;
-    Validity boxes_status[27] = {Validity::Valid};
-    std::vector <Tuple> invalid_boxes;
+    }
 }
 
 void CreateThreads(){
@@ -98,9 +136,6 @@ bool* JoinThreads(){
                 error_type[0] = true;
             else
                 error_type[1] = true;
-            sem_wait(&GLOBAL_DATA::novux);
-            GLOBAL_DATA::boxes_status[i] = Validity::Invalid;
-            sem_post(&GLOBAL_DATA::novux);
             PRINT_RED ("Thread ID: ") 
                       << ThreadStructs::row_threads[i] 
                       << " calculated INVALID --> Row[" << i << "]"
@@ -109,11 +144,6 @@ bool* JoinThreads(){
                       << "Value = " << Soduko::grid[received_position1.row][received_position1.col] 
                       << std::endl;
             pthread_cancel(ThreadStructs::row_threads[i]);
-        }
-        else{
-            sem_wait(&GLOBAL_DATA::novux);
-            GLOBAL_DATA::boxes_status[i] = Validity::Valid;
-            sem_post(&GLOBAL_DATA::novux);
         }
         pthread_join(ThreadStructs::column_threads[i],&status2);
         Tuple & received_position2 = (*((Tuple*)status2));
@@ -124,9 +154,6 @@ bool* JoinThreads(){
                 error_type[0] = true;
             else
                 error_type[1] = true;
-            sem_wait(&GLOBAL_DATA::novux);
-            GLOBAL_DATA::boxes_status[i+9] = Validity::Invalid;
-            sem_post(&GLOBAL_DATA::novux);
             PRINT_RED ("Thread ID: ") 
                       << ThreadStructs::column_threads[i] 
                       << " calculated INVALID --> Column[" << i << "]"
@@ -135,11 +162,6 @@ bool* JoinThreads(){
                       << "Value = " << Soduko::grid[received_position2.row][received_position2.col] 
                       << std::endl;
             pthread_cancel(ThreadStructs::column_threads[i]);
-        }
-        else{
-            sem_wait(&GLOBAL_DATA::novux);
-            GLOBAL_DATA::boxes_status[i+9] = Validity::Valid;
-            sem_post(&GLOBAL_DATA::novux);
         }
         pthread_join(ThreadStructs::region_threads[i],&status3);
         Tuple & received_position3 = (*((Tuple*)status3));
@@ -150,9 +172,6 @@ bool* JoinThreads(){
                 error_type[0] = true;
             else
                 error_type[1] = true;
-            sem_wait(&GLOBAL_DATA::novux);
-            GLOBAL_DATA::boxes_status[i+18] = Validity::Invalid;
-            sem_post(&GLOBAL_DATA::novux);
             PRINT_RED ("Thread ID: ") 
                       << ThreadStructs::region_threads[i] 
                       << " calculated INVALID -- > Box[" << i << "]"
@@ -161,11 +180,6 @@ bool* JoinThreads(){
                       << "Value = " << Soduko::grid[received_position3.row][received_position3.col] 
                       << std::endl;
             pthread_cancel(ThreadStructs::region_threads[i]);
-        }
-        else{
-            sem_wait(&GLOBAL_DATA::novux);
-            GLOBAL_DATA::boxes_status[i+18] = Validity::Valid;
-            sem_post(&GLOBAL_DATA::novux);
         }
     }
     return error_type;
