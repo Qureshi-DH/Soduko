@@ -41,6 +41,18 @@ namespace Utility{
             std::cout << std::endl;
         }
     }
+
+    inline Tuple IndexToStartingIndex(Tuple rec){
+        return Tuple(rec.row-rec.row%3,rec.col-rec.col%3);
+    }
+
+    inline int StartingIndexToBox(Tuple rec){
+        return rec.row + rec.col/3;
+    }
+
+    inline int IndexToBox(Tuple rec){
+        return StartingIndexToBox(IndexToStartingIndex(rec));
+    }
 }
 
 enum Validity{

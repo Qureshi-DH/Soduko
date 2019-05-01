@@ -17,3 +17,11 @@ util.h.gch
 .vscode/settings.json
 .vscode/ipch/1bc133af77f060e3/main.ipch
 .vscode/ipch/1bc133af77f060e3/mmap_address.bin
+bin/Soduko
+obj/main.o
+.vscode/ipch/dda9bbf7862094bd/mmap_address.bin
+.vscode/ipch/dda9bbf7862094bd/thread.ipch
+.vscode/ipch/391f798a7f169414/thread.ipch
+.vscode/ipch/24d2f10a8cd27d3a/main.ipch
+.vscode/ipch/391f798a7f169414/mmap_address.bin
+.vscode/ipch/24d2f10a8cd27d3a/mmap_address.bin
